@@ -11,9 +11,8 @@ CALLBACK_URL = 'http://demonmirror.com/call_back' # callback url
 
 def band(request):
 	client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
-	dms = DemonMirror.objects.all()
-	if dms:
-		dm = dms[0]
+	dm = DemonMirror.objects.filter(uid='5052773135')
+	if dm:
 		client.set_access_token(dm.access_token,dm.expires_in)
 		if not client.is_expires():
 			return HttpResponse('already band')
@@ -23,17 +22,28 @@ def band(request):
 #http://demonmirror.com/call_back?code=97f0aeffac25a739a01f657fc346bde4
 def call_back(request):
 	code = request.GET.get('code')
-	print(code)
+	# print(code)
 	client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 	r = client.request_access_token(code)
 	access_token = r.access_token # 新浪返回的token，类似abc123xyz456
-	print(access_token)
+	# print(access_token)
 	expires_in = r.expires_in # token过期的UNIX时间：http://zh.wikipedia.org/wiki/UNIX%E6%97%B6%E9%97%B4
-	print(expires_in)
-	print(r.uid)
+	# print(expires_in)
+	# print(r.uid)
 	# TODO: 在此可保存access token
-	dm = DemonMirror(uid=r.uid,access_token=access_token,expires_in=expires_in)
-	dm.save()
+	# print(type(r.uid))
+	# print('5052773135' == r.uid)
+	if '5052773135' != r.uid:
+		# return HttpResponseRedirect(reverse('dmWeibo.views.band'))
+		return HttpResponse("not expected user")
+
+	dm = DemonMirror.objects.filter(uid=r.uid)
+	if dm :
+		dm.access_token=access_token
+		dm.expires_in=expires_in
+	else:
+		dm = DemonMirror(uid=r.uid,access_token=access_token,expires_in=expires_in)
+		dm.save()
 	client.set_access_token(access_token, expires_in)
 	return HttpResponse("call_back")
 
