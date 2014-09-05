@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from dmWeibo.weibo import APIClient
 from dmWeibo.models import DemonMirror
+from django.shortcuts import render_to_response
 # Create your views here.
 APP_KEY = '2920171332' # app key
 APP_SECRET = '005a5acec91c9b92ca9eb1d349acd66a' # app secret
@@ -13,9 +14,27 @@ def band(request):
 	client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
 	dm = DemonMirror.objects.filter(uid='5052773135')
 	if dm:
-		client.set_access_token(dm.access_token,dm.expires_in)
+		client.set_access_token(dm[0].access_token,dm[0].expires_in)
 		if not client.is_expires():
 			return HttpResponse('already band')
+	url = client.get_authorize_url()
+	return HttpResponseRedirect(url)
+
+def get_mentions(request):
+	client = APIClient(app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
+	dm = DemonMirror.objects.filter(uid='5052773135')
+	if dm:
+		client.set_access_token(dm[0].access_token,dm[0].expires_in)
+		if not client.is_expires():
+			mentions = client.statuses.mentions.get()
+			pics = []
+			lpics = []
+			for st in mentions.statuses:
+				if hasattr(st,'retweeted_status') and hasattr(st.retweeted_status,'pic_urls'):
+					for pic in st.retweeted_status.pic_urls:
+						pics.append(pic.thumbnail_pic)
+						lpics.append(pic.thumbnail_pic.replace('thumbnail','large'))
+			return render_to_response('picture.html',{'pics':pics,'lpics':lpics})
 	url = client.get_authorize_url()
 	return HttpResponseRedirect(url)
 

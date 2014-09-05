@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>恶魔之境</title>	
+		
+	</head>
+
+	<body>
+			<br>
+			<br>
+	        {% if pics %}
+				{% for pic in pics %}
+				<img src="{{pic}}">
+				<br>
+	            {% endfor %}
+
+			{% else %}
+				<p>No documents.</p>
+			{% endif %}
+	</body>
+
+</html> 

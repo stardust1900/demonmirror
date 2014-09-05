@@ -10,5 +10,6 @@ urlpatterns = patterns('',
     url(r'^band$', 'dmWeibo.views.band', name='band'),
     url(r'^call_back$', 'dmWeibo.views.call_back', name='call_back'),
     url(r'^cancel_auth$', 'dmWeibo.views.cancel_auth', name='cancel_auth'),
+    url(r'^get_mentions$', 'dmWeibo.views.get_mentions', name='get_mentions'),
     url(r'^admin/', include(admin.site.urls)),
 )
