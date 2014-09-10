@@ -17,17 +17,21 @@ class Photo(models.Model):
 	source = models.CharField(max_length=140) # where this photo from weibo douban fanfou this site
 	is_show = models.SmallIntegerField() #0:不展示，1：展示
 	status = models.SmallIntegerField()  #0：待审核 1：审核通过  2：发布者删除
+	post_on = models.DateTimeField(auto_now_add=False, null=True)  #原始发布日期
+	created_on = models.DateTimeField(auto_now_add=True, null=True) #在本站的发布日期
+	tags = ListField()
+	comments = ListField(EmbeddedModelField('Comment'))
+	marks = ListField(EmbeddedModelField('Mark'))
 	mark = models.DecimalField(max_digits=4, decimal_places=1) #图片得分
 	marked_num = models.IntegerField()  #评分人数
 
 #评分对象
 class Mark(models.Model):
-	photo = models.ForeignKey(Photo)
 	marker = models.CharField(max_length=140) #打分人
-	marker_from = models.CharField(max_length=140)#打分人登录方式
 	mark = models.SmallIntegerField() #评分
+	created_on = models.DateTimeField(auto_now_add=True, null=True)
 
 class Comment(models.Model):
-	photo = models.ForeignKey(Photo)
 	text = models.CharField(max_length=140)
 	post_by = models.CharField(max_length=140)
+	created_on = models.DateTimeField(auto_now_add=True, null=True)
