@@ -12,6 +12,7 @@ class DemonMirror(models.Model):
 # 
 class Photo(models.Model):
 	text = models.CharField(max_length=140)
+	idstr = models.CharField(max_length=140,null=True)
 	thumbnail_pic = models.CharField(max_length=140)
 	original_pic = models.CharField(max_length=140)
 	post_by = models.CharField(max_length=140)
@@ -24,8 +25,8 @@ class Photo(models.Model):
 	tags = ListField()
 	comments = ListField(EmbeddedModelField('Comment'))
 	marks = ListField(EmbeddedModelField('Mark'))
-	mark = models.DecimalField(max_digits=4, decimal_places=1) #图片得分
-	marked_num = models.IntegerField()  #评分人数
+	mark = models.DecimalField(max_digits=4, decimal_places=1, default=0.0) #图片得分
+	marked_num = models.IntegerField(default=0)  #评分人数
 
 #评分对象
 class Mark(models.Model):
