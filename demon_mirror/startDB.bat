@@ -1,0 +1,1 @@
+start /b mongod --dbpath data\db > data\log\mongo.log

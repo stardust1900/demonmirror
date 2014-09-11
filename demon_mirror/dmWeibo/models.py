@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from djangotoolbox.fields import ListField, EmbeddedModelField
 
+from django_mongodb_engine.contrib import MongoDBManager
 # Create your models here.
 class DemonMirror(models.Model):
 	uid = models.CharField(max_length=140,primary_key=True)
