@@ -26,7 +26,6 @@
 				 {% endifequal%}
 				 </td>
 				 <td>
-				{{photo.status}}
 				 {% ifequal photo.status 0 %} 
 				等待审核
 				 {% else %}
@@ -34,7 +33,15 @@
 				 {% endifequal%}
 			     </td>
 				 <td>
-				{{photo.id}}
+				 	{% ifequal photo.is_show 0 %}
+				 	<a href="{% url 'display' photo.id %}">展示</a>
+				 	{% else %}
+				 	<a href="{% url 'display' photo.id %}">隐藏</a>
+				 	{% endifequal%}
+				 	{% ifequal photo.status 0 %}
+					<a href="{% url 'approve' photo.id %}">通过审核</a>
+					{% endifequal%}
+               		<a href="{% url 'remove' photo.id %}">删除</a>
 				</td>
 				</tr>
 	            {% endfor %}

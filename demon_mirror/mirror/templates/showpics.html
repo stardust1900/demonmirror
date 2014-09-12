@@ -3,21 +3,41 @@
 	<head>
 		<meta charset="utf-8">
 		<title>恶魔之境</title>	
-		
+		{% load staticfiles %}
+		<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 	</head>
 
 	<body>
-			<br>
-			<br>
+		<div class="container">
 	        {% if photos %}
 				{% for photo in photos %}
-				{{photo.text}}<img src="{{photo.thumbnail_pic}}">
-				<br>
-	            {% endfor %}
+				{% cycle 0 1 2 3 as num silent %}  
+				{% ifequal num 0 %}
+			<div class="row">
+				{% endifequal%}
 
+			<div class="col-xs-6 col-md-3">
+				<div class="thumbnail">
+					<img data-src="{{photo.original_pic}}" src="{{photo.thumbnail_pic}}" alt="...">
+					<div class="caption">
+						<p class="text-center">{{photo.text}}</p>
+						<a href="http://weibo.com/{{photo.post_by}}" target="_blank"><img src="{% static 'img/sina.jpg'%}" width="20" height="20"></a>
+					</div>
+				</div>
+			</div>
+
+				{% ifequal num 3 %}
+			</div>
+			    {% else %}{% if forloop.last%}
+			    </div>
+			    {% endif %}
+				{% endifequal%}
+
+	            {% endfor %}
 			{% else %}
 				<p>No documents.</p>
 			{% endif %}
+		</div>
 	</body>
 
 </html> 
