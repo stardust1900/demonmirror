@@ -46,6 +46,15 @@
 				</tr>
 	            {% endfor %}
 			</table>
+			<ul class="pagination">
+ 				{% for page_number in photos.paginator.page_range %}
+				    {% ifequal page_number  photos.number %}
+				      <li class="active"><a href="#">{{ page_number }} <span class="sr-only">(current)</span></a></li>
+				    {% else %}
+				      <li><a href="?page={{ page_number }}">{{ page_number }}</a></li>
+				    {% endifequal %}
+			    {% endfor %}
+			</ul>
 			{% else %}
 				<p>No documents.</p>
 			{% endif %}
