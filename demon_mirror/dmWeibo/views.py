@@ -103,14 +103,14 @@ def call_back(request):
         # return HttpResponseRedirect(reverse('dmWeibo.views.band'))
         return HttpResponse("not expected user")
 
-    dm = DemonMirror.objects.filter(uid=r.uid)
+    dm = DemonMirror.objects.get(uid=r.uid)
     if dm:
         dm.access_token = access_token
         dm.expires_in = expires_in
     else:
         dm = DemonMirror(
             uid=r.uid, access_token=access_token, expires_in=expires_in)
-        dm.save()
+    dm.save()
     client.set_access_token(access_token, expires_in)
     return HttpResponse("call_back")
 
