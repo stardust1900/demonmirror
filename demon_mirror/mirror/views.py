@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from dmWeibo.models import Photo
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-
+from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -17,7 +17,7 @@ def showpics(request):
 
 def review(request):
 	limit = 20  # 每页显示的记录数
-	photos = Photo.objects.all()
+	photos = Photo.objects.all().order_by('-created_on')
 	paginator = Paginator(photos, limit)  # 实例化一个分页对象
 	page = request.GET.get('page')  # 获取页码
 	try:
@@ -48,4 +48,4 @@ def approve(request,photoId):
 def remove(request,photoId):
 	photo = Photo.objects.get(id=photoId)
 	photo.delete()
-	return HttpResponseRedirect(reverse('mirror.views.review'))
+	return HttpResponse("success")

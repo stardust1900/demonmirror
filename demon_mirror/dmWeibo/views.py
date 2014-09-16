@@ -13,16 +13,18 @@ from django.core.exceptions import MultipleObjectsReturned
 APP_KEY = '2920171332'  # app key
 APP_SECRET = '005a5acec91c9b92ca9eb1d349acd66a'  # app secret
 CALLBACK_URL = 'http://demonmirror.com/call_back'  # callback url
-
+DM_UID = '5052773135'
 
 def band(request):
     client = APIClient(
         app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
-    dm = DemonMirror.objects.filter(uid='5052773135')
+    dm = DemonMirror.objects.filter(uid=DM_UID)
     if dm:
         client.set_access_token(dm[0].access_token, dm[0].expires_in)
         if not client.is_expires():
-            return HttpResponse('already band')
+            # return HttpResponse('already band')
+            robot = client.users.show.get(uid=DM_UID)
+            return render_to_response('robot.html', {'robot': robot})
     url = client.get_authorize_url()
     return HttpResponseRedirect(url)
 
@@ -30,7 +32,7 @@ def band(request):
 def get_mentions(request):
     client = APIClient(
         app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
-    dm = DemonMirror.objects.filter(uid='5052773135')
+    dm = DemonMirror.objects.filter(uid=DM_UID)
     if dm:
         client.set_access_token(dm[0].access_token, dm[0].expires_in)
         if not client.is_expires():
@@ -77,7 +79,9 @@ def get_mentions(request):
                 # render_to_response('picture.html',{'pics':pics,'lpics':lpics})
                 page = page + 1
                 mentions = client.statuses.mentions.get(count=count, page=page)
-            return HttpResponse("sync completed!")
+            robot = client.users.show.get(uid=DM_UID)
+            return render_to_response('robot.html', {'robot': robot,'success_msg':'同步完成！'})
+            # return HttpResponse("sync completed!")
     url = client.get_authorize_url()
     return HttpResponseRedirect(url)
 
@@ -99,11 +103,15 @@ def call_back(request):
     # TODO: 在此可保存access token
     # print(type(r.uid))
     # print('5052773135' == r.uid)
-    if '5052773135' != r.uid:
+    if DM_UID != r.uid:
         # return HttpResponseRedirect(reverse('dmWeibo.views.band'))
-        return HttpResponse("not expected user")
+        return render_to_response('result.html', {'error_msg':'绑定的不是期望账户！请重新绑定！'})
+    try:
+        dm = DemonMirror.objects.get(uid=r.uid)
+    except Exception,e:
+        dm = None
+        print(e)
 
-    dm = DemonMirror.objects.get(uid=r.uid)
     if dm:
         dm.access_token = access_token
         dm.expires_in = expires_in
@@ -112,8 +120,11 @@ def call_back(request):
             uid=r.uid, access_token=access_token, expires_in=expires_in)
     dm.save()
     client.set_access_token(access_token, expires_in)
-    return HttpResponse("call_back")
-
+    robot = client.users.show.get(uid=DM_UID)
+    return render_to_response('result.html', {'success_msg':'绑定成功！'})
 
 def cancel_auth(request):
-    return HttpResponse("cancel_auth")
+    dm = DemonMirror.objects.get(uid=DM_UID)
+    dm.delete()
+    return render_to_response('robot.html')
+    # return render_to_response('result.html', {'success_msg':'绑定成功！'})
