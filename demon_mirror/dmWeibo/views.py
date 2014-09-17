@@ -63,6 +63,7 @@ def get_mentions(request):
                             continue
 
                         post_by = st.retweeted_status.user.id
+                        post_name = st.retweeted_status.user.screen_name
                         post_on = datetime.strptime(
                             st.retweeted_status.created_at, '%a %b %d %H:%M:%S +0800 %Y')
                         for pic in st.retweeted_status.pic_urls:
@@ -72,7 +73,24 @@ def get_mentions(request):
                             pics.append(thumbnail_pic)
                             lpics.append(original_pic)
                             photo = Photo(
-                                text=text, idstr=idstr, post_by=post_by, post_on=post_on, thumbnail_pic=thumbnail_pic,
+                                text=text, idstr=idstr, post_by=post_by, post_name=post_name, post_on=post_on, thumbnail_pic=thumbnail_pic,
+                                original_pic=original_pic, retweet_by=retweet_by, source=source, is_show=is_show, status=status)
+                            photo.save()
+                    elif hasattr(st,'pic_urls'):
+                        text = st.text
+                        idstr = st.idstr
+                        post_by = st.user.id
+                        post_name = st.user.screen_name
+                        post_on = datetime.strptime(
+                            st.created_at, '%a %b %d %H:%M:%S +0800 %Y')
+                        for pic in st.pic_urls:
+                            thumbnail_pic = pic.thumbnail_pic
+                            original_pic = pic.thumbnail_pic.replace(
+                                'thumbnail', 'large')
+                            pics.append(thumbnail_pic)
+                            lpics.append(original_pic)
+                            photo = Photo(
+                                text=text, idstr=idstr, post_by=post_by, post_name=post_name, post_on=post_on, thumbnail_pic=thumbnail_pic,
                                 original_pic=original_pic, retweet_by=retweet_by, source=source, is_show=is_show, status=status)
                             photo.save()
                 # return

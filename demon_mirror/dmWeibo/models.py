@@ -16,6 +16,7 @@ class Photo(models.Model):
 	thumbnail_pic = models.CharField(max_length=140)
 	original_pic = models.CharField(max_length=140)
 	post_by = models.CharField(max_length=140)
+	post_name = models.CharField(max_length=140)
 	retweet_by = models.CharField(max_length=140)
 	source = models.CharField(max_length=140) # where this photo from weibo douban fanfou this site
 	is_show = models.SmallIntegerField() #0:不展示，1：展示
