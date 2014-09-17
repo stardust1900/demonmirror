@@ -14,5 +14,7 @@ urlpatterns = patterns('',
     url(r'^get_mentions$', 'dmWeibo.views.get_mentions', name='get_mentions'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^mirror/', include('mirror.urls')),
+    url(r'^rater/', include('rater.urls')),
+    url(r'^accounts/login/$', 'django.contrib.auth.views.login',{'template_name':'login.html'}),
 )
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

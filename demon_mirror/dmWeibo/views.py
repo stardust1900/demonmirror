@@ -9,12 +9,15 @@ from django.shortcuts import render_to_response
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import MultipleObjectsReturned
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 APP_KEY = '2920171332'  # app key
 APP_SECRET = '005a5acec91c9b92ca9eb1d349acd66a'  # app secret
 CALLBACK_URL = 'http://demonmirror.com/call_back'  # callback url
 DM_UID = '5052773135'
 
+@login_required
 def band(request):
     client = APIClient(
         app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)

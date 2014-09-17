@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'dmWeibo',
     'mirror',
+    'rater',
 )
 
 MIDDLEWARE_CLASSES = (
