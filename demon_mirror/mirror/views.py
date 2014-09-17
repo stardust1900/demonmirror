@@ -43,7 +43,7 @@ def approve(request,photoId):
 	photo.status = 1
 	photo.is_show = 1
 	photo.save()
-	return HttpResponseRedirect(reverse('mirror.views.review'))
+	return HttpResponseRedirect(reverse('mirror.views.review')+'?page='+request.GET.get('page'))
 
 def remove(request,photoId):
 	photo = Photo.objects.get(id=photoId)

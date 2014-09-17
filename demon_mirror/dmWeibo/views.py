@@ -17,7 +17,7 @@ APP_SECRET = '005a5acec91c9b92ca9eb1d349acd66a'  # app secret
 CALLBACK_URL = 'http://demonmirror.com/call_back'  # callback url
 DM_UID = '5052773135'
 
-@login_required
+# @login_required
 def band(request):
     client = APIClient(
         app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)

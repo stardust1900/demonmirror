@@ -41,7 +41,7 @@
 				 	<a href="{% url 'display' photo.id %}">隐藏</a>
 				 	{% endifequal%}
 				 	{% ifequal photo.status 0 %}
-					<a href="{% url 'approve' photo.id %}">通过审核</a>
+					<a href="{% url 'approve' photo.id %}?page={{ photos.number }}">通过审核</a>
 					{% endifequal%}
                		<!-- <a href="{% url 'remove' photo.id %}" onclick="removePhoto(this,'{{photo.id}}')">删除</a> -->
                		<a href="#" onclick="removePhoto(this,'{{photo.id}}')">删除</a>
