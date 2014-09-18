@@ -22,7 +22,8 @@ class Photo(models.Model):
 	is_show = models.SmallIntegerField() #0:不展示，1：展示
 	status = models.SmallIntegerField()  #0：待审核 1：审核通过  2：发布者删除
 	post_on = models.DateTimeField(auto_now_add=False, null=True)  #原始发布日期
-	created_on = models.DateTimeField(auto_now_add=True, null=True) #在本站的发布日期
+	retweet_on = models.DateTimeField(auto_now_add=True, null=True) #转发日期
+	pass_on = models.DateTimeField(auto_now_add=False, null=True) #审核通过日期
 	tags = ListField()
 	comments = ListField(EmbeddedModelField('Comment'))
 	marks = ListField(EmbeddedModelField('Mark'))

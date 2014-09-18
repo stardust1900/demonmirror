@@ -10,7 +10,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import MultipleObjectsReturned
 from django.contrib.auth.decorators import login_required
-
+from django.utils.timezone import LocalTimezone
 # Create your views here.
 APP_KEY = '2920171332'  # app key
 APP_SECRET = '005a5acec91c9b92ca9eb1d349acd66a'  # app secret
@@ -64,11 +64,13 @@ def get_mentions(request):
                         	continue
                         if p:
                             continue
-
                         post_by = st.retweeted_status.user.id
                         post_name = st.retweeted_status.user.screen_name
                         post_on = datetime.strptime(
-                            st.retweeted_status.created_at, '%a %b %d %H:%M:%S +0800 %Y')
+                            st.retweeted_status.created_at, '%a %b %d %H:%M:%S +0800 %Y').replace(tzinfo=LocalTimezone())
+                        retweet_on = datetime.strptime(
+                            st.created_at, '%a %b %d %H:%M:%S +0800 %Y').replace(tzinfo=LocalTimezone())
+
                         for pic in st.retweeted_status.pic_urls:
                             thumbnail_pic = pic.thumbnail_pic
                             original_pic = pic.thumbnail_pic.replace(
@@ -77,15 +79,26 @@ def get_mentions(request):
                             lpics.append(original_pic)
                             photo = Photo(
                                 text=text, idstr=idstr, post_by=post_by, post_name=post_name, post_on=post_on, thumbnail_pic=thumbnail_pic,
-                                original_pic=original_pic, retweet_by=retweet_by, source=source, is_show=is_show, status=status)
+                                original_pic=original_pic, retweet_by=retweet_by, source=source, is_show=is_show, status=status,retweet_on=retweet_on)
                             photo.save()
                     elif hasattr(st,'pic_urls'):
                         text = st.text
                         idstr = st.idstr
+                        try:
+                            p = Photo.objects.get(idstr=idstr)
+                        except ObjectDoesNotExist:
+                            p = None
+                        except MultipleObjectsReturned:
+                            continue
+                        if p:
+                            continue
                         post_by = st.user.id
                         post_name = st.user.screen_name
                         post_on = datetime.strptime(
-                            st.created_at, '%a %b %d %H:%M:%S +0800 %Y')
+                            st.created_at, '%a %b %d %H:%M:%S +0800 %Y').replace(tzinfo=LocalTimezone())
+                        # print('created_at: %s'%st.created_at)
+                        # print(post_on)
+                        retweet_on = post_on
                         for pic in st.pic_urls:
                             thumbnail_pic = pic.thumbnail_pic
                             original_pic = pic.thumbnail_pic.replace(
@@ -94,7 +107,7 @@ def get_mentions(request):
                             lpics.append(original_pic)
                             photo = Photo(
                                 text=text, idstr=idstr, post_by=post_by, post_name=post_name, post_on=post_on, thumbnail_pic=thumbnail_pic,
-                                original_pic=original_pic, retweet_by=retweet_by, source=source, is_show=is_show, status=status)
+                                original_pic=original_pic, retweet_by=retweet_by, source=source, is_show=is_show, status=status,retweet_on=retweet_on)
                             photo.save()
                 # return
                 # render_to_response('picture.html',{'pics':pics,'lpics':lpics})
