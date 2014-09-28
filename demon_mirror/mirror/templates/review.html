@@ -46,6 +46,9 @@
                		<!-- <a href="{% url 'remove' photo.id %}" onclick="removePhoto(this,'{{photo.id}}')">删除</a> -->
                		<a href="#" onclick="removePhoto(this,'{{photo.id}}')">删除</a>
 				</td>
+				<td>
+					{{photo.retweet_on}}||{{photo.post_on}}
+				</td>
 				</tr>
 	            {% endfor %}
 			</table>

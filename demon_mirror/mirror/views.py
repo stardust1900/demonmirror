@@ -17,7 +17,7 @@ def showpics(request):
 
 def review(request):
 	limit = 20  # 每页显示的记录数
-	photos = Photo.objects.all().order_by('retweet_on')
+	photos = Photo.objects.all().order_by('-retweet_on')
 	paginator = Paginator(photos, limit)  # 实例化一个分页对象
 	page = request.GET.get('page')  # 获取页码
 	try:

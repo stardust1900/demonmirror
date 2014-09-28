@@ -39,7 +39,7 @@ def get_mentions(request):
     if dm:
         client.set_access_token(dm[0].access_token, dm[0].expires_in)
         if not client.is_expires():
-            count = 100
+            count = 200
             page = 1
 
             mentions = client.statuses.mentions.get(count=count, page=page)
