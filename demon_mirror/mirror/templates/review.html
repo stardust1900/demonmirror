@@ -16,7 +16,7 @@
 				{% for photo in photos %}
 				<tr>
 				<td>
-				<a href="#" class="thumbnail">
+				<a href="{{photo.original_pic}}" class="thumbnail" target="_blank">
 				<img src="{{photo.thumbnail_pic}}" class="img-rounded"> 
 				 </a>
 				</td>
@@ -49,6 +49,27 @@
 				<td>
 					{{photo.retweet_on}}||{{photo.post_on}}
 				</td>
+				<td>
+				  <div class="form-inline form-group">
+				    <div class="input-group">
+				      <div id="div_{{photo.id}}"class="input-group-addon">
+				      	{% if photo.tags%}
+				      	{%for tag in photo.tags%}
+				      	<div class="label label-default ">
+							<span>{{tag}}</span>
+							<span name="closespan" style="cursor: pointer;">&times;</span>
+				        </div>
+				        &nbsp;
+				        {%endfor%}
+						{% endif %}
+				  </div>
+				      
+				      <input id="{{photo.id}}" type="text" class="form-control" placeholder="Tag">
+				    </div>
+				  </div>
+				</td>
+				<td>	
+			      </td>
 				</tr>
 	            {% endfor %}
 			</table>
@@ -92,6 +113,95 @@ function removePhoto(obj,pId){
 	});
 	//alert(obj.parentNode.parentNode.rowIndex);
 }
+
+$.each($(".form-control"),function(index,obj){
+	$(obj).bind("keydown",function(e){
+		if(e.keyCode == 13 && (""!=$.trim($(obj).val()))){
+			// alert($(obj).attr("id"));
+			$.ajax({
+				type:"POST",
+				url:"{% url 'addTag' %}",
+				data:{photoId:$(obj).attr("id"),tag:$(obj).val()},
+				success: function(data){
+					if("" != data) {
+						var objDiv = $("#div_"+$(obj).attr("id"));
+						var oldHtml = objDiv.html();
+						var newHtml = oldHtml + "<div class='input-group-addon label label-default'><span>"
+									+data+
+									"</span> <span name='closespan' style='cursor: pointer;'>&times;</span> </div> &nbsp;";
+					    objDiv.html(newHtml);
+					    $(obj).val("");
+				    }else{
+				    	$(obj).val("");
+				    }
+				},
+				error:function(data){
+					alert(data);
+				}
+			});
+		}
+	});
+});
+
+$.each($(".input-group-addon"),function(index,obj){
+	$(obj).delegate("[name='closespan']","click",function(){
+		var objDiv =$(this).parent().parent();
+		$.ajax({
+			type:"POST",
+			url:"{% url 'removeTag' %}",
+			data:{photoId:objDiv.attr("id").replace("div_",""),tag:$(this).prev().text()},
+			success:function(data){
+				objDiv.html("");
+				if("" != data) {
+					// alert(data);
+					tags = data.split(",");
+					newHtml = "";
+					for(var tag in tags) {
+						var newHtml = newHtml + "<div class='input-group-addon label label-default'><span>"
+									+tags[tag]+
+									"</span> <span name='closespan' style='cursor: pointer;'>&times;</span> </div> &nbsp;";
+					}
+					objDiv.html(newHtml);
+				}				
+			},
+			error:function(data){
+				alert(data);
+			}
+		});
+	
+	});
+});
+
+// $.each($("[name='closespan']"),function(index,obj){
+// 	$(obj).bind("click",function(){
+// 		// alert($(obj).prev().text());
+// 		// alert($(obj).parent().parent().attr("id"));
+// 		var objDiv =$(obj).parent().parent();
+// 		$.ajax({
+// 			type:"POST",
+// 			url:"{% url 'removeTag' %}",
+// 			data:{photoId:objDiv.attr("id").replace("div_",""),tag:$(obj).prev().text()},
+// 			success:function(data){
+// 				objDiv.html("");
+// 				if("" != data) {
+// 					alert(data);
+// 					tags = data.split(",");
+// 					newHtml = "";
+// 					for(var tag in tags) {
+// 						var newHtml = newHtml + "<div class='input-group-addon label label-default'><span>"
+// 									+tags[tag]+
+// 									"</span> <span name='closespan' style='cursor: pointer;'>&times;</span> </div> &nbsp;";
+// 					}
+// 					objDiv.html(newHtml);
+// 				}
+				
+// 			},
+// 			error:function(data){
+// 				alert(data);
+// 			}
+// 		});
+// 	});
+// });
 </script>
 	</body>
 

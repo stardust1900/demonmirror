@@ -10,6 +10,8 @@ from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from datetime import datetime
 from django.utils.timezone import utc
+from django.views.decorators.csrf import csrf_exempt
+
 def showpics(request):
 	photos = Photo.objects.filter(is_show=1).filter(status=1).order_by('pass_on')
 	return render_to_response('showpics.html', {'photos': photos})
@@ -51,3 +53,39 @@ def remove(request,photoId):
 	photo = Photo.objects.get(id=photoId)
 	photo.delete()
 	return HttpResponse("success")
+
+@csrf_exempt
+def addTag(request):
+	# print(request)
+	if request.method == 'POST':
+		photoId = request.POST.get('photoId','');
+		tag = request.POST.get('tag','');
+		# print(photoId)
+		# print(tag)
+		if ("" != photoId and "" != tag):
+			photo = Photo.objects.get(id=photoId)
+			print(photo.tags)
+			if photo.tags.count(tag) == 0:
+				photo.tags.append(tag);
+				photo.save()
+				return HttpResponse(tag)
+			else:
+				return HttpResponse("")
+	return HttpResponse("error")
+
+@csrf_exempt
+def removeTag(request):
+	if request.method == 'POST':
+		photoId = request.POST.get('photoId','');
+		tag = request.POST.get('tag','');
+		if ("" != photoId and "" != tag):
+			photo = Photo.objects.get(id=photoId)
+			photo.tags.remove(tag)
+			photo.save()
+			ret = ""
+			for tag in photo.tags:
+				ret = ret +tag+","
+			if "" != ret:
+				ret=ret[:-1]
+			return HttpResponse(ret)
+	return HttpResponse("error")

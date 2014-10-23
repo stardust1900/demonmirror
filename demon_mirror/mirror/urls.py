@@ -7,4 +7,6 @@ urlpatterns = patterns('mirror.views',
     url(r'^display/(\w+)/$', 'display', name='display'),
     url(r'^approve/(\w+)/$', 'approve', name='approve'),
     url(r'^remove/(\w+)/$', 'remove', name='remove'),
+    url(r'^addTag/$', 'addTag', name='addTag'),
+    url(r'^removeTag/$', 'removeTag', name='removeTag'),
 )
