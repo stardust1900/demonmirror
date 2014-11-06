@@ -4,13 +4,14 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('demonmirror', 'demonmirror@163.com'),
 )
 
 MANAGERS = ADMINS
 
 import os
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 if 'SERVER_SOFTWARE' in os.environ:
     from sae.const import (
         MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB
@@ -19,9 +20,9 @@ else:
     # Make `python manage.py syncdb` works happy!
     MYSQL_HOST = 'localhost'
     MYSQL_PORT = '3306'
-    MYSQL_USER = 'root'
-    MYSQL_PASS = 'root'
-    MYSQL_DB   = 'app_pylabs'
+    MYSQL_USER = 'demonmirror'
+    MYSQL_PASS = 'demonmirror'
+    MYSQL_DB   = 'demonmirror'
 
 DATABASES = {
     'default': {
@@ -74,7 +75,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -85,6 +86,10 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    ("js", os.path.join(STATIC_ROOT,'js')),
+    ("css", os.path.join(STATIC_ROOT,'css')),
+    ("img", os.path.join(STATIC_ROOT,'img')),
+    ("fonts", os.path.join(STATIC_ROOT,'fonts')),
 )
 
 # List of finder classes that know how to find static files in
@@ -137,6 +142,9 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'dmWeibo',
+    'mirror',
+    'rater',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
