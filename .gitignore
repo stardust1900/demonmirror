@@ -40,3 +40,4 @@ Icon
 #database files
 demon_mirror/data/db/*
 demon_mirror/data/log/*
+.svn
