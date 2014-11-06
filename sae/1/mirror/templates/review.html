@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>恶魔之镜</title>	
+		{% load staticfiles %}
+		<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+		<script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+	</head>
+
+	<body>
+<div class="container">
+	<div class="alert alert-info" role="alert"></div>
+	        {% if photos %}
+	        <table class="table">
+				{% for photo in photos %}
+				<tr>
+				<td>
+				<a href="{{photo.original_pic}}" class="thumbnail" target="_blank">
+				<img src="{{photo.thumbnail_pic}}" class="img-rounded"> 
+				 </a>
+				</td>
+				<td>
+				 {% ifequal photo.is_show 1 %} 
+				 <span class="glyphicon glyphicon-eye-open"></span>
+				 {% else %}
+				 <span class="glyphicon glyphicon-eye-close"></span>
+				 {% endifequal%}
+				 </td>
+				 <td>
+				 {% ifequal photo.status 0 %} 
+				等待审核
+				 {% else %}
+				审核通过
+				 {% endifequal%}
+			     </td>
+				 <td>
+				 	{% ifequal photo.is_show 0 %}
+				 	<a href="{% url display photo.id %}">展示</a>
+				 	{% else %}
+				 	<a href="{% url display photo.id %}">隐藏</a>
+				 	{% endifequal%}
+				 	{% ifequal photo.status 0 %}
+					<a href="{% url approve photo.id %}?page={{ photos.number }}">通过审核</a>
+					{% endifequal%}
+               		<a href="#" onclick="removePhoto(this,'{{photo.id}}')">删除</a>
+				</td>
+				<td>
+					{{photo.retweet_on}}||{{photo.post_on}}
+				</td>
+				<td>
+				  <div class="form-inline form-group">
+				    <div class="input-group">
+				      <div id="div_{{photo.id}}"class="input-group-addon">
+				      	{% if photo.tags%}
+				      	{%for tag in photo.tags%}
+				      	<div class="label label-default ">
+							<span>{{tag}}</span>
+							<span name="closespan" style="cursor: pointer;">&times;</span>
+				        </div>
+				        &nbsp;
+				        {%endfor%}
+						{% endif %}
+				  </div>
+				      
+				      <input id="{{photo.id}}" type="text" class="form-control" placeholder="Tag">
+				    </div>
+				  </div>
+				</td>
+				<td>	
+			      </td>
+				</tr>
+	            {% endfor %}
+			</table>
+			<ul class="pagination">
+				{% ifequal photos.number 1 %}
+				 <li><a href="?page=1">&laquo;</a></li>
+				{% else %}
+				 <li><a href="?page={{photos.number|add:'-1'}}">&laquo;</a></li>
+				{% endifequal %}
+ 				{% for page_number in photos.paginator.page_range %}
+				    {% ifequal page_number  photos.number %}
+				      <li class="active"><a href="#">{{ page_number }} <span class="sr-only">(current)</span></a></li>
+				    {% else %}
+				    	{% if page_number > photos.number|add:'-10' and page_number < photos.number|add:'10' %}
+				      <li><a href="?page={{ page_number }}">{{ page_number }}</a></li>
+				        {% endif %}
+				    {% endifequal %}
+			    {% endfor %}
+			    <li><a href="?page={{photos.number|add:'1'}}">&raquo;</a></li>
+			</ul>
+			{% else %}
+				<p>No documents.</p>
+			{% endif %}
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".alert").hide();
+});
+function removePhoto(obj,pId){
+	$.ajax({
+		type: "GET",
+		url:"/mirror/remove/"+pId,
+		success:function(data){
+			// alert(data);
+			$(".alert").html("删除成功！").show().hide(3000);
+			$(".table tr:eq("+obj.parentNode.parentNode.rowIndex+")").remove();
+		},
+		error:function(data){
+			alert(data);
+		}
+	});
+	//alert(obj.parentNode.parentNode.rowIndex);
+}
+
+$.each($(".form-control"),function(index,obj){
+	$(obj).bind("keydown",function(e){
+		if(e.keyCode == 13 && (""!=$.trim($(obj).val()))){
+			// alert($(obj).attr("id"));
+			$.ajax({
+				type:"POST",
+				url:"{% url addTag %}",
+				data:{photoId:$(obj).attr("id"),tag:$(obj).val()},
+				success: function(data){
+					if("" != data) {
+						var objDiv = $("#div_"+$(obj).attr("id"));
+						var oldHtml = objDiv.html();
+						var newHtml = oldHtml + "<div class='input-group-addon label label-default'><span>"
+									+data+
+									"</span> <span name='closespan' style='cursor: pointer;'>&times;</span> </div> &nbsp;";
+					    objDiv.html(newHtml);
+					    $(obj).val("");
+				    }else{
+				    	$(obj).val("");
+				    }
+				},
+				error:function(data){
+					alert(data);
+				}
+			});
+		}
+	});
+});
+
+$.each($(".input-group-addon"),function(index,obj){
+	$(obj).delegate("[name='closespan']","click",function(){
+		var objDiv =$(this).parent().parent();
+		$.ajax({
+			type:"POST",
+			url:"{% url removeTag %}",
+			data:{photoId:objDiv.attr("id").replace("div_",""),tag:$(this).prev().text()},
+			success:function(data){
+				objDiv.html("");
+				if("" != data) {
+					// alert(data);
+					tags = data.split(",");
+					newHtml = "";
+					for(var tag in tags) {
+						var newHtml = newHtml + "<div class='input-group-addon label label-default'><span>"
+									+tags[tag]+
+									"</span> <span name='closespan' style='cursor: pointer;'>&times;</span> </div> &nbsp;";
+					}
+					objDiv.html(newHtml);
+				}				
+			},
+			error:function(data){
+				alert(data);
+			}
+		});
+	
+	});
+});
+
+</script>
+	</body>
+
+</html> 
