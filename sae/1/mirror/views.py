@@ -5,6 +5,7 @@ from dmWeibo.models import Photo
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -16,7 +17,7 @@ def showpics(request):
 	photos = Photo.objects.filter(is_show=1).filter(status=1).order_by('pass_on')
 	return render_to_response('showpics.html', {'photos': photos})
 
-
+@login_required
 def review(request):
 	limit = 20  # 每页显示的记录数
 	photos = Photo.objects.all().order_by('-retweet_on')
@@ -31,6 +32,7 @@ def review(request):
 
 	return render_to_response('review.html',{'photos':photos}) 
 
+@login_required
 def display(request,photoId):
 	photo = Photo.objects.get(id=photoId)
 	if 0==photo.is_show:
@@ -39,7 +41,7 @@ def display(request,photoId):
 		photo.is_show = 0
 	photo.save()
 	return HttpResponseRedirect(reverse('mirror.views.review'))
-
+@login_required
 def approve(request,photoId):
 	Photo.objects.filter(id=photoId).update(status = 1,is_show = 1,pass_on=datetime.utcnow().replace(tzinfo=utc))
 	# photo.status = 1
@@ -48,12 +50,12 @@ def approve(request,photoId):
 	# print(photo.pass_on)
 	# photo.save()
 	return HttpResponseRedirect(reverse('mirror.views.review')+'?page='+request.GET.get('page'))
-
+@login_required
 def remove(request,photoId):
 	photo = Photo.objects.get(id=photoId)
 	photo.delete()
 	return HttpResponse("success")
-
+@login_required
 @csrf_exempt
 def addTag(request):
 	# print(request)
@@ -72,7 +74,7 @@ def addTag(request):
 			else:
 				return HttpResponse("")
 	return HttpResponse("error")
-
+@login_required
 @csrf_exempt
 def removeTag(request):
 	if request.method == 'POST':

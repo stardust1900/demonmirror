@@ -10,6 +10,8 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import MultipleObjectsReturned
 from django.contrib.auth.decorators import login_required
+from django.contrib import auth
+from django.contrib.auth.models import User
 from django.utils.timezone import LocalTimezone
 import re
 
@@ -24,7 +26,41 @@ try:
 except re.error:
 	REPAT = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
 
-# @login_required
+
+def login(request):
+    if request.method == 'GET':
+        loginForm = LoginForm()
+        if 'next' in request.GET:
+            loginForm.next = request.GET['next']
+        else:
+            loginForm.next = "/"
+        return render_to_response('login.html', {'form': loginForm}, context_instance=RequestContext(request))
+    else:
+        username = request.POST['username']
+        password = request.POST['password']
+        next = request.POST['next']
+        if next.strip()=='':
+            next = "/"
+        user = auth.authenticate(username=username, password=password)
+
+        if user is not None and user.is_active:
+            auth.login(request, user)
+            return HttpResponseRedirect(next)
+        else:
+            loginForm = LoginForm()
+            if 'next' in request.GET:
+                loginForm.next = request.GET['next']
+            else:
+                loginForm.next = "/"
+            return render_to_response('login.html', {'form': loginForm, 'password_is_wrong': True}, context_instance=RequestContext(request))
+
+
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect("/")
+
+
+@login_required
 def band(request):
     client = APIClient(
         app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL)
