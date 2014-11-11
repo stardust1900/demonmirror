@@ -14,7 +14,17 @@ from django.utils.timezone import utc
 from django.views.decorators.csrf import csrf_exempt
 
 def showpics(request):
+	limit = 20
 	photos = Photo.objects.filter(is_show=1).filter(status=1).order_by('pass_on')
+	paginator = Paginator(photos, limit)  # 实例化一个分页对象
+	page = request.GET.get('page')  # 获取页码
+	try:
+		photos = paginator.page(page)  # 获取某页对应的记录
+	except PageNotAnInteger:  # 如果页码不是个整数
+		photos = paginator.page(1)  # 取第一页的记录
+	except EmptyPage:  # 如果页码太大，没有相应的记录
+		photos = paginator.page(paginator.num_pages)  # 取最后一页的记录
+		
 	return render_to_response('showpics.html', {'photos': photos})
 
 @login_required
